@@ -1,0 +1,72 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "value": "sshUsername"
+        },
+        "authenticationType": {
+            "value": "sshPublicKey"
+        },
+        "diagnosticStorageAccountName": {
+            "value": "chefdiag894684b932"
+        },
+        "diagnosticStorageAccountNewOrExisting": {
+            "value": "new"
+        },
+        "diagnosticStorageAccountType": {
+            "value": "Standard_LRS"
+        },
+        "diagnosticStorageAccountResourceGroup": {
+            "value": "sp-chefautomate-vm"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "resourceGroupName": {
+            "value": "sp-chefautomate-vm"
+        },
+        "sshPublicKey": {
+            "value": "ssh-rsa your-key-here"
+        },
+        "storageAccountName": {
+            "value": "chefdisk1767271a1f"
+        },
+        "storageAccountNewOrExisting": {
+            "value": "new"
+        },
+        "storageAccountType": {
+            "value": "Standard_LRS"
+        },
+        "storageAccountResourceGroup": {
+            "value": "sp-chefautomate-vm"
+        },
+        "subnetName": {
+            "value": "infrastructure-subnet"
+        },
+        "subnetPrefix": {
+            "value": "10.128.1.0/24"
+        },
+        "virtualNetworkAddressPrefix": {
+            "value": "10.128.0.0/16"
+        },
+        "virtualNetworkName": {
+            "value": "myco-vnet-01"
+        },
+        "virtualNetworkNewOrExisting": {
+            "value": "existing"
+        },
+        "virtualNetworkResourceGroup": {
+            "value": "sp-networking"
+        },
+        "vmName": {
+            "value": "vmchefautomate"
+        },
+        "vmSize": {
+            "value": "Standard_D2_v2"
+        },
+        "fqdn": {
+            "value": "vmchefautomate"
+        }
+    }
+}
