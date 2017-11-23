@@ -60,7 +60,7 @@
             "metadata": {
                 "description": "The name of the product offering"
             },
-            "defaultValue": "chef-automate"
+            "defaultValue": "chef-automate-vm-image"
         },
         "imageSKU": {
             "type": "string",
@@ -140,6 +140,13 @@
                 "description": "Virtual Network Address space"
             },
             "defaultValue": "10.0.0.0/16"
+        },
+        "privateStaticIpAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Virtual Network Static IP Address"
+            },
+            "defaultValue": "10.128.1.100"
         },
         "virtualNetworkName": {
             "type": "string",
@@ -413,7 +420,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "10.128.1.100",
+                            "privateIPAddress": "[parameters('privateStaticIpAddress')]",
                             "subnet": {
                                 "id": "[reference('VirtualNetworkSetup').outputs.subnetRef.value]"
                             }

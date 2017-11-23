@@ -50,6 +50,9 @@
         "virtualNetworkAddressPrefix": {
             "value": "10.128.0.0/16"
         },
+        "privateStaticIpAddress": {
+            "value": "10.128.0.100"
+        },
         "virtualNetworkName": {
             "value": "myco-vnet-01"
         },
