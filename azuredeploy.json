@@ -6,8 +6,7 @@
             "type": "securestring",
             "metadata": {
                 "description": "Password for the Virtual Machine."
-            },
-            "defaultValue": ""
+            }
         },
         "adminUsername": {
             "type": "string",
@@ -141,12 +140,23 @@
             },
             "defaultValue": "10.0.0.0/16"
         },
+        "methodForObtainingIpAddress": {
+            "type": "string",
+            "allowedValues": [
+                "Dynamic",
+                "Static"
+            ],
+            "defaultValue": "Dynamic",
+            "metadata": {
+                "Description": "If IP Address is obtained Dynamically, privateStaticIpAddress will not be used"
+            }
+        },
         "privateStaticIpAddress": {
             "type": "string",
+            "defaultValue": "10.128.1.100",
             "metadata": {
-                "description": "Virtual Network Static IP Address"
-            },
-            "defaultValue": "10.128.1.100"
+                "description": "Virtual Network Static IP Address, only used if methodForObtainingIpAddress is Static"
+            }
         },
         "virtualNetworkName": {
             "type": "string",
@@ -243,7 +253,25 @@
             "storageAccount": "[concat(parameters('baseUrl'), '/storageaccount_', parameters('storageAccountNewOrExisting'), '.json')]",
             "diagnosticStorageAccount": "[concat(parameters('baseUrl'), '/storageaccount_', parameters('diagnosticStorageAccountNewOrExisting'), '.json')]",
             "vnet": "[concat(parameters('baseUrl'), '/vnet_', parameters('virtualNetworkNewOrExisting'), '.json')]"
-        }
+        },
+        "vnetId": "[resourceId(parameters('virtualNetworkResourceGroup'),'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "ipAddressMethod": {
+            "Static": {
+                "privateIPAllocationMethod": "Static",
+                "privateIPAddress": "[parameters('privateStaticIpAddress')]",
+                "subnet": {
+                    "id": "[variables('subnetRef')]"
+                }
+        },
+            "Dynamic": {
+                "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                    "id": "[variables('subnetRef')]"
+                }
+            }
+        },
+        "ipAddressObject": "[variables('ipAddressMethod')[parameters('methodForObtainingIpAddress')]]"
     },
     "resources": [
         {
@@ -418,18 +446,51 @@
                 "ipConfigurations": [
                     {
                         "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[parameters('privateStaticIpAddress')]",
-                            "subnet": {
-                                "id": "[reference('VirtualNetworkSetup').outputs.subnetRef.value]"
-                            }
-                        }
+                        "properties": "[variables('ipAddressObject')]"
                     }
                 ],
+
                 "networkSecurityGroup": {
                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('sgName'))]"
                 }
+            }
+        },
+        {
+        "apiVersion": "2017-05-10",
+        "name": "nestedTemplate",
+        "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.7",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/networkInterfaces",
+                            "name": "[variables('nicName')]",
+                            "apiVersion": "[variables('apiVersions').networkInterfaces]",
+                            "location": "[parameters('location')]",
+                            "dependson": [],
+                            "properties": {
+                                "ipConfigurations": [
+                                    {
+                                        "name": "ipconfig1",
+                                        "properties": {
+                                            "subnet": {
+                                                "id": "[variables('subnetRef')]"
+                                            },
+                                            "privateIPAllocationMethod": "Static",
+                                            "privateIPAddress": "[reference(concat('Microsoft.Network/networkInterfaces/', variables('nicName')), variables('apiVersions').networkInterfaces).ipConfigurations[0].properties.privateIPAddress]"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+            "parameters": {}
             }
         },
         {
